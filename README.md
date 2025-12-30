@@ -1,4 +1,4 @@
-# WC3Stats Auto Uploader
+# WC3Stats Auto Uploader (LEAUGE FORK)
 
 ## Table of Contents
 
