@@ -2,6 +2,8 @@ if (require ('electron-squirrel-startup')) return;
 
 /** **/
 
+require('dotenv').config();
+
 const { app, Tray, Menu, shell, dialog } = require ('electron');
 const logger = require ('electron-log');
 const path = require ('path');
@@ -11,7 +13,6 @@ const Netio = require ('./lib/modules/netio');
 
 logger.transports.file.fileName = 'log.txt';
 logger.transports.file.level = 'info';
-logger.transports.file.init ();
 
 logger.info ('Starting up...');
 
@@ -61,6 +62,11 @@ app.on ('ready', () => {
     /* Defaults */ require ('./config')
   );
 
+  // Load league URL from environment variable if available
+  if (process.env.LEAGUE_URL) {
+    config.set('leagueUpload.url', process.env.LEAGUE_URL);
+  }
+
   logger.info (`[General] App version: [v${config.get ('version')}]`);
 
   /** **/
@@ -78,9 +84,41 @@ app.on ('ready', () => {
     },
 
     {
+      label: 'Enable League Upload',
+      type: 'checkbox',
+      checked: config.get('leagueUpload.enabled'),
+      click: (menuItem) => {
+        const enabled = menuItem.checked;
+        config.set('leagueUpload.enabled', enabled);
+        logger.info(`[General] League upload ${enabled ? 'enabled' : 'disabled'}.`);
+
+        if (enabled && !config.get('leagueUpload.url')) {
+          dialog.showMessageBox(null, {
+            type: 'warning',
+            title: 'League URL Not Set',
+            message: 'League upload is enabled but LEAGUE_URL is not configured in .env file. Please set it and restart the application.'
+          });
+        }
+      }
+    },
+
+    {
+      label: 'Enable Storm Prevention',
+      type: 'checkbox',
+      checked: config.get('stormPrevention.enabled'),
+      click: (menuItem) => {
+        const enabled = menuItem.checked;
+        config.set('stormPrevention.enabled', enabled);
+        const minDelay = config.get('stormPrevention.minDelay');
+        const maxDelay = config.get('stormPrevention.maxDelay');
+        logger.info(`[General] Storm prevention ${enabled ? 'enabled' : 'disabled'} (${minDelay}-${maxDelay}s delay).`);
+      }
+    },
+
+    {
       label: 'Logs',
       click: () => {
-        shell.openItem (logger.transports.file.file);
+        shell.openPath (logger.transports.file.file);
       }
     },
 

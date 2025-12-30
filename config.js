@@ -8,6 +8,25 @@ module.exports = {
     `!${app.getPath ('home')}/Documents/Warcraft III/BattleNet/**/TempReplay.w3g`
   ],
 
+  /**
+   * League upload settings.
+   */
+  leagueUpload: {
+    enabled: false,
+    url: ''
+  },
+
+  /**
+   * Storm prevention: Random delay before uploads to prevent
+   * multiple players uploading simultaneously after a game ends.
+   * Delay is in seconds.
+   */
+  stormPrevention: {
+    enabled: true,
+    minDelay: 0,
+    maxDelay: 15
+  },
+
   netio: {
     requests: `${app.getPath ('home')}/Documents/Warcraft III/CustomMapData/networkio/requests/**/*.*`,
     responses: `${app.getPath ('home')}/Documents/Warcraft III/CustomMapData/networkio/responses`,
